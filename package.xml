@@ -2,7 +2,7 @@
 
 <package>
   <name>look_at_pose</name>
-  <version>0.7.3</version>
+  <version>0.7.4</version>
   <description>Rotate camera to look at a given pose.</description>
   <maintainer email="andyz@utexas.edu">Andy Zelenak</maintainer>
   <author>Andy Zelenak</author>
