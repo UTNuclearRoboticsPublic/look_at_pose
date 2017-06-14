@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<package>
+  <name>look_at_pose</name>
+  <version>0.7.3</version>
+  <description>Rotate camera to look at a given pose.</description>
+  <maintainer email="andyz@utexas.edu">Andy Zelenak</maintainer>
+  <author>Andy Zelenak</author>
+  <license>see license.txt</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>message_generation</build_depend>
+  
+  <run_depend>roscpp</run_depend> 
+  <run_depend>message_runtime</run_depend>
+
+</package>
+
+
