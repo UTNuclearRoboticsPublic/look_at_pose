@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 //      Title     : vaultbot-nrg
 //      Project   : Vaultbot
-//      Created   : 2/23/2016
-//      Author    : Andrew Sharp, Ben Ebersole, etc.
+//      Created   : 5/31/2017
+//      Author    : Andy Zelenak
 //      Platforms : Ubuntu 64-bit
 //      Copyright : Copyright© The University of Texas at Austin, 2014-2017. All rights reserved.
 //                 
@@ -26,6 +26,6 @@
 //          including but not limited to those resulting from defects in software
 //          and/or documentation, or loss or inaccuracy of data of any kind.
 //
-//      Purpose : 
+//      Purpose : Look at an arbitrary pose while maintaining an upright camera.
 //
 ///////////////////////////////////////////////////////////////////////////////
