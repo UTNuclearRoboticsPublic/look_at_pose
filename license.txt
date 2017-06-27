@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-//      Title     : vaultbot-nrg
-//      Project   : Vaultbot
+//      Title     : look_at_pose
+//      Project   : look_at_pose
 //      Created   : 5/31/2017
 //      Author    : Andy Zelenak
 //      Platforms : Ubuntu 64-bit
