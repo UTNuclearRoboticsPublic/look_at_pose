@@ -19,6 +19,6 @@ link_directories(${catkin_LIBRARY_DIRS})
 ## Install ##
 #############
 
-install(PROGRAMS scripts/look_at_pose_server.py scripts/test_client.py
+catkin_install_python(PROGRAMS nodes/look_at_pose_server nodes/test_client
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
