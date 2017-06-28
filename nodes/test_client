@@ -62,4 +62,5 @@ if __name__ == "__main__":
     up_vector.vector.z = -0.95
 
     # Call the service
+    rospy.wait_for_service('look_at_pose')
     print "new camera pose: %s"% look_at_pose_client(initial_cam_pose, target_pose, up_vector)
