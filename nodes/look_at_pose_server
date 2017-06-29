@@ -74,10 +74,9 @@ def handle_look_at_pose(req):
   new_cam_pose.pose.position = initial_cam_pose.pose.position
 
   # The rotation of the new camera pose is encapsulated in R, the rotation matrix.
-  R_inv = numpy.linalg.inv(R)
-  T = numpy.matrix( [ [ R_inv.item(0,0), R_inv.item(0,1), R_inv.item(0,2), 0 ],
-                      [ R_inv.item(1,0), R_inv.item(1,1), R_inv.item(1,2), 0 ],
-                      [ R_inv.item(2,0), R_inv.item(2,1), R_inv.item(2,2), 0 ],
+  T = numpy.matrix( [ [ R.item(0,0), R.item(0,1), R.item(0,2), 0 ],
+                      [ R.item(1,0), R.item(1,1), R.item(1,2), 0 ],
+                      [ R.item(2,0), R.item(2,1), R.item(2,2), 0 ],
 		      [ 0, 0, 0, 1]] )
 
 
@@ -142,7 +141,7 @@ def calc_new_cam_unit_vectors():
   # Cross product was not zero, so we can rotate the z axis to be upright-ish
   else:
     new_cam_y = cross_product(new_cam_x, up_vector.vector)
-    new_cam_y = normalize(new_cam_y) # Everything has already been normalized, but it doesn't hurt to check    
+    new_cam_y = normalize(new_cam_y) # Everything has already been normalized, but it doesn't hurt to check
     new_cam_z = cross_product(new_cam_x, new_cam_y)
     # Does new_cam_z have the right sign? If not, flip it and recalculate new_cam_y, too.
     if dot_product(new_cam_z, up_vector.vector) < 0: # It is anti-parallel with UP
