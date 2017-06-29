@@ -28,17 +28,29 @@ def handle_look_at_pose(req):
   initial_cam_pose = req.initial_cam_pose
   up_vector = req.up  # Tell us what direction is up
 
+  ################
+  # Input checking
+  ################
   # Inputs should all be in the same frame as the initial camera pose.
   # Thus, I avoid dealing with tf in this script.
   # The client should handle that externally.
-  if (up_vector.header.frame_id != initial_cam_pose.header.frame_id):
+  if up_vector.header.frame_id != initial_cam_pose.header.frame_id:
     rospy.logerr(up_vector.header.frame_id)
     rospy.logerr(initial_cam_pose.header.frame_id)
     rospy.logerr("The vector that defines UP (req.up) should be in the same frame as the initial camera pose.")
     sys.exit()
 
-  if (target_pose.header.frame_id != initial_cam_pose.header.frame_id):
+  if target_pose.header.frame_id != initial_cam_pose.header.frame_id:
     rospy.logerr("The target pose (req.target_pose) should be in the same frame as the initial camera pose.")
+    sys.exit()
+
+  # The initial camera pose should be (0,0,0) (0,0,0,1) in its own frame
+  if initial_cam_pose.pose.position.x!=0 or initial_cam_pose.pose.position.y!=0 or initial_cam_pose.pose.position.z!=0:
+    rospy.logerr("The initial camera pose should be (0,0,0) (0,0,0,1) in its own frame.")
+    sys.exit()
+
+  if initial_cam_pose.pose.orientation.x!=0 or initial_cam_pose.pose.orientation.y!=0 or initial_cam_pose.pose.orientation.z!=0 or initial_cam_pose.pose.orientation.w!=1:
+    rospy.logerr("The initial camera pose should be (0,0,0) (0,0,0,1) in its own frame.")
     sys.exit()
 
   #################################################################
