@@ -1,66 +1,138 @@
 #!/usr/bin/env python
 
+########################################################
 # Andy Zelenak, 2017
+# Get a 3D point of interest. Use look_at_pose
+# to calculate a new camera pose, looking at that point.
+# Put an RViz frame at that pose, for visualization.
+########################################################
 
-# Send test poses to the look_at_pose server
-# Print the returned pose, which is a new camera position
-
-#!/usr/bin/env python
-
+from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import Vector3Stamped
 from look_at_pose.srv import *
-
+from visualization_msgs.msg import Marker
 import rospy
 import tf
 
-def look_at_pose_client(new_cam_pose, target_pose, up_vector):
-    rospy.wait_for_service('look_at_pose')
-    try:
-        look_at_pose = rospy.ServiceProxy('look_at_pose', LookAtPose)
-        new_cam_pose = look_at_pose(new_cam_pose, target_pose, up_vector)
-        return new_cam_pose
-    except rospy.ServiceException, e:
-        print "Service call failed: %s"%e
 
-if __name__ == "__main__":
-    rospy.init_node('test_client')
+def test_rotate_cam():
+  rospy.init_node('test_rotate_cam')
 
-    # Define the initial camera pose and the target pose to be viewed.
-    # Then send them to the service
+  # Call the /rviz_textured_sphere/get_pt service to get the point of interest (Vector3Stamped)
+  pt_of_interest = get_pt()
 
-    # Initial camera pose
-    initial_cam_pose = geometry_msgs.msg.PoseStamped()
-  
-    initial_cam_pose.header.stamp = rospy.Time.now()
-    initial_cam_pose.header.frame_id = "ee_frame"
-  
-    initial_cam_pose.pose.position.x = 0
-    initial_cam_pose.pose.position.y = 0
-    initial_cam_pose.pose.position.z = 0
-  
-    initial_cam_pose.pose.orientation.x = 0.39
-    initial_cam_pose.pose.orientation.y = -0.45
-    initial_cam_pose.pose.orientation.z = -0.53
-    initial_cam_pose.pose.orientation.w = 0.595
+  # Display the object in RViz
+  display_object( pt_of_interest )
 
-    # For the target pose
-    # Should be in the same frame as initial_camera_pose
-    target_pose = geometry_msgs.msg.PoseStamped()
-    target_pose.header.stamp = rospy.Time.now()
-    target_pose.header.frame_id = initial_cam_pose.header.frame_id
+  # Call the /look_at_pose service to get a new camera position
+  new_pose = new_cam_pose( pt_of_interest )
 
-    target_pose.pose.position.x = 1.13
-    target_pose.pose.position.y = -0.17
-    target_pose.pose.position.z = -0.27
+  # Publish a tf frame based on the new camera pose
+  # so we can visualize it in RViz
+  publish_tf( new_pose )
 
-    # Vector pointing up.
-    # Should be in the same frame as initial_camera_pose
-    up_vector = geometry_msgs.msg.Vector3Stamped()
-    up_vector.header.frame_id = initial_cam_pose.header.frame_id
-    up_vector.header.stamp = rospy.Time.now()
-    up_vector.vector.x = -0.28
-    up_vector.vector.y = -0.109
-    up_vector.vector.z = -0.95
+  return
 
-    # Call the service
-    rospy.wait_for_service('look_at_pose')
-    print "new camera pose: %s"% look_at_pose_client(initial_cam_pose, target_pose, up_vector)
+###########################
+# Set the point of interest
+###########################
+def get_pt():
+  response = Vector3Stamped()
+  response.header.frame_id = "camera_ee_link"
+  response.vector.x = 1
+  response.vector.y = -1
+  response.vector.z = 0.1
+  print "\n\nPoint of interest: \n%s"%response
+
+  return response
+
+###############################
+# Display the object's location
+###############################
+def display_object( pt ):
+  marker = Marker()
+  marker.header.frame_id = "camera_ee_link"
+  marker.type = marker.SPHERE
+  marker.action = marker.ADD
+  marker.scale.x = 0.1
+  marker.scale.y = 0.1
+  marker.scale.z = 0.1
+  marker.color.a = 1.0
+  marker.color.r = 1.0
+  marker.color.g = 1.0
+  marker.color.b = 0.0
+  marker.pose.orientation.w = 1
+  marker.pose.position.x = pt.vector.x
+  marker.pose.position.y = pt.vector.y
+  marker.pose.position.z = pt.vector.z
+
+  pub = rospy.Publisher("visualization_marker", Marker, queue_size = 100)
+  rospy.sleep(1)
+  pub.publish(marker)
+
+  return
+
+########################################################
+# Call /look_at_pose/LookAtPose to get a new camera pose
+########################################################
+def new_cam_pose( pt_of_interest ):
+  # Stuff the service request
+
+  initial_cam_pose = PoseStamped()
+  initial_cam_pose.header.stamp = rospy.Time.now()
+  initial_cam_pose.header.frame_id = "camera_ee_link"
+  initial_cam_pose.pose.position.x = 0
+  initial_cam_pose.pose.position.y = 0
+  initial_cam_pose.pose.position.z = 0
+  initial_cam_pose.pose.orientation.x = 0
+  initial_cam_pose.pose.orientation.y = 0
+  initial_cam_pose.pose.orientation.z = 0
+  initial_cam_pose.pose.orientation.w = 1
+
+  target_pose = PoseStamped()
+  target_pose.header.stamp = rospy.Time.now()
+  target_pose.header.frame_id = initial_cam_pose.header.frame_id
+  target_pose.pose.position.x = pt_of_interest.vector.x
+  target_pose.pose.position.y = pt_of_interest.vector.y
+  target_pose.pose.position.z = pt_of_interest.vector.z
+  target_pose.pose.orientation.w = 1
+
+  # Vector pointing up.
+  up_vector = Vector3Stamped()
+  up_vector.header.frame_id = initial_cam_pose.header.frame_id
+  up_vector.header.stamp = rospy.Time.now()
+  up_vector.vector.x = 0 #-0.28
+  up_vector.vector.y = 1 #-0.109
+  up_vector.vector.z = 1 #-0.95
+
+  # Call the service
+  rospy.wait_for_service('look_at_pose')
+  look_at_pose_client = rospy.ServiceProxy('look_at_pose', LookAtPose)
+  response = look_at_pose_client(initial_cam_pose, target_pose, up_vector)
+
+  print "\n\nNew cam pose: \n%s" %response
+  print "\n\n"
+
+  return response.new_cam_pose
+
+#####################
+# Publish a tf frame.
+#####################
+def publish_tf( poseStamped ):
+  print poseStamped
+  br = tf.TransformBroadcaster()
+  rate = rospy.Rate(10.0)
+  while not rospy.is_shutdown():
+    br.sendTransform( (poseStamped.pose.position.x, poseStamped.pose.position.y, poseStamped.pose.position.z), 
+	(poseStamped.pose.orientation.x, poseStamped.pose.orientation.y, poseStamped.pose.orientation.z, poseStamped.pose.orientation.w),
+	poseStamped.header.stamp, "new_cam_frame", "camera_ee_link" )
+
+    rate.sleep()
+
+  return
+
+######
+# Main
+######
+if __name__ == '__main__':
+  test_rotate_cam()
