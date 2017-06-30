@@ -101,9 +101,9 @@ def new_cam_pose( pt_of_interest ):
   up_vector = Vector3Stamped()
   up_vector.header.frame_id = initial_cam_pose.header.frame_id
   up_vector.header.stamp = rospy.Time.now()
-  up_vector.vector.x = 0 #-0.28
-  up_vector.vector.y = 1 #-0.109
-  up_vector.vector.z = 1 #-0.95
+  up_vector.vector.x = 0
+  up_vector.vector.y = 0
+  up_vector.vector.z = 1
 
   # Call the service
   rospy.wait_for_service('look_at_pose')
